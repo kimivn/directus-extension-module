@@ -72,6 +72,29 @@
   font-size: 20px;
   font-weight: 600;
   color: var(--theme--foreground);
+  white-space: nowrap;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.search-input {
+  max-width: 300px;
+}
+
+.status-filter {
+  width: 180px;
 }
 
 .data-table {
@@ -171,4 +194,11 @@ td.actions {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   max-width: 100px;
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px !important;
+  color: var(--theme--foreground-subdued);
+  font-style: italic;
 }

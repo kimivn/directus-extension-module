@@ -12,12 +12,18 @@
 
     <div class="orders-container">
       <StatsCards :orders="orders" />
+      <OrderChart :orders="orders" />
 
       <RecentOrders
-        :orders="orders"
+        :orders="pagedOrders"
+        :loading="loading"
+        :has-more="hasMore"
+        v-model:search="searchQuery"
+        v-model:status="statusFilter"
         @add="openAddModal"
         @edit="openEditModal"
         @delete="deleteOrder"
+        @load-more="orderStore.loadMore"
       />
 
       <OrderModal
@@ -32,24 +38,20 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import type { Stats, Order } from "./types";
-import { mockStats, mockOrders } from "./mockup/mockData";
+import { storeToRefs } from "pinia";
+import { useOrderStore } from "./store/orderStore";
+import type { Order } from "./types";
 import StatsCards from "./components/StatsCards.vue";
+import OrderChart from "./components/OrderChart.vue";
 import RecentOrders from "./components/RecentOrders.vue";
 import OrderModal from "./components/OrderModal.vue";
 import "./styles/order-module.css";
 
-const stats = ref<Stats>(mockStats);
-const orders = ref<Order[]>(mockOrders);
+const orderStore = useOrderStore();
+const { orders, searchQuery, statusFilter, pagedOrders, loading, hasMore } = storeToRefs(orderStore);
 
 const isModalActive = ref(false);
 const editingOrder = ref<Order | null>(null);
-
-const refreshData = () => {
-  stats.value.users = Math.floor(Math.random() * 100);
-  stats.value.items = Math.floor(Math.random() * 2000);
-  stats.value.lastUpdated = new Date().toLocaleDateString();
-};
 
 const openAddModal = () => {
   editingOrder.value = null;
@@ -66,21 +68,14 @@ const openEditModal = (id: number) => {
 
 const handleSave = (order: Order) => {
   if (editingOrder.value) {
-    const index = orders.value.findIndex((o) => o.id === order.id);
-    if (index !== -1) {
-      orders.value[index] = order;
-    }
+    orderStore.updateOrder(order);
   } else {
-    const newId = orders.value.length > 0 ? Math.max(...orders.value.map((o) => o.id)) + 1 : 1001;
-    orders.value.unshift({
-      ...order,
-      id: newId,
-    });
+    orderStore.addOrder(order);
   }
   isModalActive.value = false;
 };
 
 const deleteOrder = (id: number) => {
-  orders.value = orders.value.filter((order) => order.id !== id);
+  orderStore.deleteOrder(id);
 };
 </script>

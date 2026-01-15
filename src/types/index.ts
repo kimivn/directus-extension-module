@@ -16,10 +16,3 @@ export interface Order {
   customer_name: string;
   customer_email: string;
 }
-
-export interface Stats {
-  users: number;
-  collections: number;
-  items: number;
-  lastUpdated: string;
-}
